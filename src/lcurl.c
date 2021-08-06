@@ -236,14 +236,14 @@ static int lcurl_call_request(lua_State* L, struct lcurl_request* request)
         curl_easy_setopt(request->curl, CURLOPT_POSTFIELDS, post);
         curl_easy_setopt(request->curl, CURLOPT_POSTFIELDSIZE, length);
     }
-    if (!curl_multi_add_handle(lcurl.curlm, request->curl) == CURLM_OK) {
-        curl_cleanup_request(request);
-        lua_pushboolean(L, false);
-        lua_pushstring(L, "curl_multi_add_handle failed!");
-        return 2;
+    if (curl_multi_add_handle(lcurl.curlm, request->curl) == CURLM_OK) {
+        lua_pushboolean(L, true);
+        return 1;
     }
-    lua_pushboolean(L, true);
-    return 1;
+    curl_cleanup_request(request);
+    lua_pushboolean(L, false);
+    lua_pushstring(L, "curl_multi_add_handle failed!");
+    return 2;
 }
 
 static int lcurl_call_get(lua_State* L)
