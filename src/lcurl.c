@@ -19,16 +19,14 @@
 #define LUA_CURL_TIMEOUT_MS     3000
 #define LUA_CURL_REQUEST_META   "_LUA_CURL_REQUEST_META"
 
-struct lua_curl
-{
+typedef struct lua_curl {
     CURLM* curlm;
     CURL* encode_curl;
-};
+} lua_curl_t;
 
-static struct lua_curl lcurl = { 0 };
+static lua_curl_t lcurl = { 0 };
 
-struct lcurl_request
-{
+typedef struct lcurl_request {
     CURL* curl;
     struct curl_slist* header;
     char error[CURL_ERROR_SIZE];
@@ -36,10 +34,9 @@ struct lcurl_request
     size_t content_length;
     size_t content_maxlength;
     bool content_realloc_failed;
-};
+} lcurl_request_t;
 
-static CURL* lcurl_realquery(CURLcode* ret_result)
-{
+static CURL* lcurl_realquery(CURLcode* ret_result) {
     while (true) {
         int msgs_in_queue;
         CURLMsg* curlmsg = curl_multi_info_read(lcurl.curlm, &msgs_in_queue);
@@ -52,8 +49,7 @@ static CURL* lcurl_realquery(CURLcode* ret_result)
     }
 }
 
-static int lcurl_query(lua_State* L)
-{
+static int lcurl_query(lua_State* L) {
     CURLcode handle_result;
     CURL* handle = lcurl_realquery(&handle_result);
     if (handle) {
@@ -71,9 +67,8 @@ static int lcurl_query(lua_State* L)
     return 0;
 }
 
-static size_t write_callback(char* buffer, size_t block_size, size_t count, void* arg)
-{
-    struct lcurl_request* request = (struct lcurl_request*)arg;
+static size_t write_callback(char* buffer, size_t block_size, size_t count, void* arg) {
+    lcurl_request_t* request = (lcurl_request_t*)arg;
     assert(request);
 
     size_t length = block_size * count;
@@ -96,8 +91,7 @@ static size_t write_callback(char* buffer, size_t block_size, size_t count, void
     return length;
 }
 
-static void curl_cleanup_request(struct lcurl_request* request)
-{
+static void curl_cleanup_request(lcurl_request_t* request) {
     if (request && lcurl.curlm) {
         curl_multi_remove_handle(lcurl.curlm, request->curl);
         curl_easy_cleanup(request->curl);
@@ -109,18 +103,16 @@ static void curl_cleanup_request(struct lcurl_request* request)
     }
 }
 
-static int lcurl_close_request(lua_State* L)
-{
-    struct lcurl_request* request = (struct lcurl_request*)lua_touserdata(L, 1);
+static int lcurl_close_request(lua_State* L) {
+    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
     if (request) {
         curl_cleanup_request(request);
     }
     return 0;
 }
 
-static int lcurl_getrespond(lua_State* L)
-{
-    struct lcurl_request* request = (struct lcurl_request*)lua_touserdata(L, 1);
+static int lcurl_getrespond(lua_State* L) {
+    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
     if (!request) {
         lua_pushnil(L);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -138,9 +130,8 @@ static int lcurl_getrespond(lua_State* L)
     return 2;
 }
 
-static int lcurl_getinfo(lua_State* L)
-{
-    struct lcurl_request* request = (struct lcurl_request*)lua_touserdata(L, 1);
+static int lcurl_getinfo(lua_State* L) {
+    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
     if (!request) {
         lua_pushnil(L);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -179,9 +170,8 @@ static int lcurl_getinfo(lua_State* L)
     return 1;
 }
 
-static int lcurl_getprogress(lua_State* L)
-{
-    struct lcurl_request* request = (struct lcurl_request*)lua_touserdata(L, 1);
+static int lcurl_getprogress(lua_State* L) {
+    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
     if (!request) {
         lua_pushnil(L);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -207,9 +197,8 @@ static int lcurl_getprogress(lua_State* L)
     return 2;
 }
 
-static int lcurl_set_headers(lua_State* L)
-{
-    struct lcurl_request* request = (struct lcurl_request*)lua_touserdata(L, 1);
+static int lcurl_set_headers(lua_State* L) {
+    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
     if (!request) {
         lua_pushboolean(L, false);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -228,8 +217,7 @@ static int lcurl_set_headers(lua_State* L)
     return 1;
 }
 
-static int lcurl_call_request(lua_State* L, struct lcurl_request* request)
-{
+static int lcurl_call_request(lua_State* L, lcurl_request_t* request) {
     if (lua_gettop(L) > 1) {
         size_t length;
         const char* post = lua_tolstring(L, 2, &length);
@@ -246,9 +234,8 @@ static int lcurl_call_request(lua_State* L, struct lcurl_request* request)
     return 2;
 }
 
-static int lcurl_call_get(lua_State* L)
-{
-    struct lcurl_request* request = (struct lcurl_request*)lua_touserdata(L, 1);
+static int lcurl_call_get(lua_State* L) {
+    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
     if (!request) {
         lua_pushboolean(L, false);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -257,9 +244,8 @@ static int lcurl_call_get(lua_State* L)
     return lcurl_call_request(L, request);
 }
 
-static int lcurl_call_post(lua_State* L)
-{
-    struct lcurl_request* request = (struct lcurl_request*)lua_touserdata(L, 1);
+static int lcurl_call_post(lua_State* L) {
+    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
     if (!request) {
         lua_pushboolean(L, false);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -269,9 +255,8 @@ static int lcurl_call_post(lua_State* L)
     return lcurl_call_request(L, request);
 }
 
-static int lcurl_call_put(lua_State* L)
-{
-    struct lcurl_request* request = (struct lcurl_request*)lua_touserdata(L, 1);
+static int lcurl_call_put(lua_State* L) {
+    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
     if (!request) {
         lua_pushboolean(L, false);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -281,9 +266,8 @@ static int lcurl_call_put(lua_State* L)
     return lcurl_call_request(L, request);
 }
 
-static int lcurl_call_del(lua_State* L)
-{
-    struct lcurl_request* request = (struct lcurl_request*)lua_touserdata(L, 1); 
+static int lcurl_call_del(lua_State* L) {
+    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1); 
     if (!request) {
         lua_pushboolean(L, false);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -318,8 +302,8 @@ static int lcurl_create_request(lua_State* L) {
         lua_pushstring(L, "curl_easy_init failed!");
         return 2;
     }
-    struct lcurl_request* request = (struct lcurl_request*)malloc(sizeof(struct lcurl_request));
-    memset(request, 0, sizeof(struct lcurl_request));
+    lcurl_request_t* request = (lcurl_request_t*)malloc(sizeof(lcurl_request_t));
+    memset(request, 0, sizeof(lcurl_request_t));
     lua_pushlightuserdata(L, request);
     if (luaL_getmetatable(L, LUA_CURL_REQUEST_META) != LUA_TTABLE) {
         lua_pop(L, 1);
@@ -343,8 +327,7 @@ static int lcurl_create_request(lua_State* L) {
     return 2;
 }
 
-static int lcurl_destory(lua_State* L)
-{
+static int lcurl_destory(lua_State* L) {
     if (lcurl.encode_curl) {
         curl_easy_cleanup(lcurl.encode_curl);
         lcurl.encode_curl = NULL;
@@ -357,8 +340,7 @@ static int lcurl_destory(lua_State* L)
     return 0;
 }
 
-static int lcurl_url_encode(lua_State* L)
-{
+static int lcurl_url_encode(lua_State* L) {
     if (!lcurl.encode_curl) {
         lcurl.encode_curl = curl_easy_init();
     }
