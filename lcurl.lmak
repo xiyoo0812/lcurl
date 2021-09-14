@@ -4,7 +4,7 @@ PROJECT_NAME = "lcurl"
 --目标名字
 TARGET_NAME = "lcurl"
 
---工程类型：static/dynamic/exe
+----工程类型: static/dynamic/exe
 PROJECT_TYPE = "dynamic"
 
 --需要的FLAGS
@@ -17,13 +17,45 @@ INCLUDES = {
 	"../lua/lua"
 }
 
+--WINDOWS需要include目录
+WINDOWS_INCLUDES = {
+	"./"
+}
+
 --需要连接的库文件
 LIBS = {
-	"lua",
+	"lua"
+}
+
+--需要连接的库文件
+LINUX_LIBS = {
 	"curl"
+}
+
+--需要连接的库文件
+DARWIN_LIBS = {
+	"curl"
+}
+
+--需要连接的库文件
+WINDOWS_LIBS = {
+	"libcurl.a"
+}
+
+--需要附件link库目录
+LIBRARY_DIR = {
+	"bin"
+}
+
+--WINDOWS预编译的库文件，需要copy到bin目录
+WINDOWS_PREBUILDS = {
+	[[bin/libcurl-x64.dll]]
 }
 
 --依赖项目
 DEPS = {
 	"lualib"
 }
+
+--分组定义
+GROUP = "luaext"
