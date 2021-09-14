@@ -33,7 +33,7 @@ MYCFLAGS += -I../lua/lua
 #LDFLAGS
 LDFLAGS =
 
-#需要附件link库目录
+#需要附加link库目录
 LDFLAGS += -Lbin
 
 #源文件路径

@@ -42,7 +42,7 @@ WINDOWS_LIBS = {
 	"libcurl.a"
 }
 
---需要附件link库目录
+--需要附加link库目录
 LIBRARY_DIR = {
 	"bin"
 }
