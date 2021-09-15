@@ -64,7 +64,7 @@
       </ForceFileOutput>
     </Link>
     <PreBuildEvent>
-      <Command>copy /y bin/libcurl-x64.dll $(SolutionDir)bin</Command>
+      <Command>copy /y bin\libcurl-x64.dll $(SolutionDir)bin</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>copy /y $(TargetPath) $(SolutionDir)bin</Command>
