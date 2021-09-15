@@ -42,8 +42,8 @@ WINDOWS_LIBS = {
 	"libcurl.a"
 }
 
---需要附加link库目录
-LIBRARY_DIR = {
+--WINDOWS需要附加link库目录
+WINDOWS_LIBRARY_DIR = {
 	"bin"
 }
 
