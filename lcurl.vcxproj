@@ -9,7 +9,7 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src/lcurl.c" />
+    <ClCompile Include="src\lcurl.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6B01DD6C-28A1-231F-FE9B-1D3F40E3CA3B}</ProjectGuid>

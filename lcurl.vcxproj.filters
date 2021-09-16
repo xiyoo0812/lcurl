@@ -3,7 +3,7 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src/lcurl.c">
+    <ClCompile Include="src\lcurl.c">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
