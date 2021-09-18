@@ -99,12 +99,11 @@ static void curl_cleanup_request(lcurl_request_t* request) {
         if (request->content) {
             free(request->content);
         }
-        free(request);
     }
 }
 
-static int lcurl_close_request(lua_State* L) {
-    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
+static int lcurl_request_gc(lua_State* L) {
+    lcurl_request_t* request = (lcurl_request_t*)luaL_checkudata(L, 1, LUA_CURL_REQUEST_META);
     if (request) {
         curl_cleanup_request(request);
     }
@@ -112,7 +111,7 @@ static int lcurl_close_request(lua_State* L) {
 }
 
 static int lcurl_getrespond(lua_State* L) {
-    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
+    lcurl_request_t* request = (lcurl_request_t*)luaL_checkudata(L, 1, LUA_CURL_REQUEST_META);
     if (!request) {
         lua_pushnil(L);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -131,7 +130,7 @@ static int lcurl_getrespond(lua_State* L) {
 }
 
 static int lcurl_getinfo(lua_State* L) {
-    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
+    lcurl_request_t* request = (lcurl_request_t*)luaL_checkudata(L, 1, LUA_CURL_REQUEST_META);
     if (!request) {
         lua_pushnil(L);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -171,7 +170,7 @@ static int lcurl_getinfo(lua_State* L) {
 }
 
 static int lcurl_getprogress(lua_State* L) {
-    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
+    lcurl_request_t* request = (lcurl_request_t*)luaL_checkudata(L, 1, LUA_CURL_REQUEST_META);
     if (!request) {
         lua_pushnil(L);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -198,7 +197,7 @@ static int lcurl_getprogress(lua_State* L) {
 }
 
 static int lcurl_set_headers(lua_State* L) {
-    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
+    lcurl_request_t* request = (lcurl_request_t*)luaL_checkudata(L, 1, LUA_CURL_REQUEST_META);
     if (!request) {
         lua_pushboolean(L, false);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -235,7 +234,7 @@ static int lcurl_call_request(lua_State* L, lcurl_request_t* request) {
 }
 
 static int lcurl_call_get(lua_State* L) {
-    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
+    lcurl_request_t* request = (lcurl_request_t*)luaL_checkudata(L, 1, LUA_CURL_REQUEST_META);
     if (!request) {
         lua_pushboolean(L, false);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -245,7 +244,7 @@ static int lcurl_call_get(lua_State* L) {
 }
 
 static int lcurl_call_post(lua_State* L) {
-    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
+    lcurl_request_t* request = (lcurl_request_t*)luaL_checkudata(L, 1, LUA_CURL_REQUEST_META);
     if (!request) {
         lua_pushboolean(L, false);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -256,7 +255,7 @@ static int lcurl_call_post(lua_State* L) {
 }
 
 static int lcurl_call_put(lua_State* L) {
-    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1);
+    lcurl_request_t* request = (lcurl_request_t*)luaL_checkudata(L, 1, LUA_CURL_REQUEST_META);
     if (!request) {
         lua_pushboolean(L, false);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -267,7 +266,7 @@ static int lcurl_call_put(lua_State* L) {
 }
 
 static int lcurl_call_del(lua_State* L) {
-    lcurl_request_t* request = (lcurl_request_t*)lua_touserdata(L, 1); 
+    lcurl_request_t* request = (lcurl_request_t*)luaL_checkudata(L, 1, LUA_CURL_REQUEST_META);
     if (!request) {
         lua_pushboolean(L, false);
         lua_pushstring(L, "lcurl_request is nil!");
@@ -278,15 +277,15 @@ static int lcurl_call_del(lua_State* L) {
 }
 
 static const luaL_Reg lrequest[] = {
+    { "get_info", lcurl_getinfo },
     { "call_get", lcurl_call_get },
     { "call_put", lcurl_call_put },
     { "call_del", lcurl_call_del },
     { "call_post", lcurl_call_post },
+    { "get_respond", lcurl_getrespond },
     { "set_headers", lcurl_set_headers },
     { "get_progress", lcurl_getprogress },
-    { "get_respond", lcurl_getrespond },
-    { "close", lcurl_close_request },
-    { "get_info", lcurl_getinfo },
+    { "__gc", lcurl_request_gc },
     { NULL, NULL }
 };
 
@@ -302,13 +301,13 @@ static int lcurl_create_request(lua_State* L) {
         lua_pushstring(L, "curl_easy_init failed!");
         return 2;
     }
-    lcurl_request_t* request = (lcurl_request_t*)malloc(sizeof(lcurl_request_t));
+    lcurl_request_t* request = (lcurl_request_t*)lua_newuserdata(L, sizeof(lcurl_request_t));
     memset(request, 0, sizeof(lcurl_request_t));
-    lua_pushlightuserdata(L, request);
     if (luaL_getmetatable(L, LUA_CURL_REQUEST_META) != LUA_TTABLE) {
         lua_pop(L, 1);
         luaL_newmetatable(L, LUA_CURL_REQUEST_META);
-        luaL_newlib(L, lrequest);
+        luaL_setfuncs(L, lrequest, 0);
+        lua_pushvalue(L, -1);
         lua_setfield(L, -2, "__index");
     }
     curl_easy_setopt(handle, CURLOPT_URL, url);
