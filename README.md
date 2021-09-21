@@ -7,7 +7,6 @@
   |--proj <br>
   &emsp;|--lua <br>
   &emsp;|--lcurl
-- [luaext](https://github.com/xiyoo0812/luaext.git) 集成了所有lua扩展库，建议使用或者参考。
 
 # 注意事项
 - linux编译请先安装curl-devel。
