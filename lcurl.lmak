@@ -49,7 +49,7 @@ WINDOWS_LIBRARY_DIR = {
 
 --WINDOWS预编译的库文件，需要copy到bin目录
 WINDOWS_PREBUILDS = {
-	[[bin\libcurl-x64.dll]]
+	"bin/libcurl-x64.dll"
 }
 
 --依赖项目
