@@ -9,52 +9,52 @@ PROJECT_TYPE = "dynamic"
 
 --需要的FLAGS
 FLAGS = {
-	"Wno-sign-compare"
+    "Wno-sign-compare"
 }
 
 --需要的include目录
 INCLUDES = {
-	"../lua/lua"
+    "../lua/lua"
 }
 
 --WINDOWS需要include目录
 WINDOWS_INCLUDES = {
-	"./"
+    "./"
 }
 
 --需要连接的库文件
 LIBS = {
-	"lua"
+    "lua"
 }
 
 --需要连接的库文件
 LINUX_LIBS = {
-	"curl"
+    "curl"
 }
 
 --需要连接的库文件
 DARWIN_LIBS = {
-	"curl"
+    "curl"
 }
 
 --需要连接的库文件
 WINDOWS_LIBS = {
-	"libcurl.a"
+    "libcurl.a"
 }
 
 --WINDOWS需要附加link库目录
 WINDOWS_LIBRARY_DIR = {
-	"bin"
+    "bin"
 }
 
---WINDOWS预编译的库文件，需要copy到bin目录
+--WINDOWS预编译命令
 WINDOWS_PREBUILDS = {
-	"bin/libcurl-x64.dll"
+    { "copy /y", "bin/libcurl-x64.dll $(SolutionDir)bin" },
 }
 
 --依赖项目
 DEPS = {
-	"lualib"
+    "lualib"
 }
 
 --分组定义
