@@ -220,8 +220,10 @@ static int lcurl_call_request(lua_State* L, lcurl_request_t* request) {
     if (lua_gettop(L) > 1) {
         size_t length;
         const char* post = lua_tolstring(L, 2, &length);
-        curl_easy_setopt(request->curl, CURLOPT_POSTFIELDS, post);
-        curl_easy_setopt(request->curl, CURLOPT_POSTFIELDSIZE, length);
+        if (length > 0) {
+            curl_easy_setopt(request->curl, CURLOPT_POSTFIELDS, post);
+            curl_easy_setopt(request->curl, CURLOPT_POSTFIELDSIZE, length);
+        }
     }
     if (curl_multi_add_handle(lcurl.curlm, request->curl) == CURLM_OK) {
         lua_pushboolean(L, true);
