@@ -42,6 +42,11 @@ WINDOWS_LIBS = {
     "libcurl.a"
 }
 
+--WINDOWS需要定义的选项
+WINDOWS_DEFINES = {
+	"LUA_BUILD_AS_DLL"
+}
+
 --WINDOWS需要附加link库目录
 WINDOWS_LIBRARY_DIR = {
     "bin"

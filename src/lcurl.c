@@ -1,4 +1,5 @@
-﻿#include <stdlib.h>
+﻿#define LUA_LIB
+#include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
 #include <string.h>
@@ -7,12 +8,6 @@
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
-
-#ifdef _MSC_VER
-#define LCURL_API _declspec(dllexport)
-#else
-#define LCURL_API 
-#endif
 
 #define MAX(a, b)               (((a) > (b)) ? (a) : (b))
 
@@ -366,7 +361,7 @@ static const luaL_Reg lcurl_funs[] = {
     { NULL, NULL }
 };
 
-LCURL_API int luaopen_lcurl(lua_State* L) {
+LUALIB_API int luaopen_lcurl(lua_State* L) {
     if (!lcurl.curlm) {
         curl_version_info_data* data = curl_version_info(CURLVERSION_NOW);
         if (data->version_num < 0x070F04) {
