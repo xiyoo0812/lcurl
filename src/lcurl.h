@@ -44,12 +44,12 @@ namespace lcurl {
 
         bool call_post(string data) {
             curl_easy_setopt(curl, CURLOPT_POST, 1L);
-            return request(data);
+            return request(data, true);
         }
 
         bool call_put(string data) {
             curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
-            return request(data);
+            return request(data, true);
         }
 
         bool call_del(string data) {
@@ -72,11 +72,11 @@ namespace lcurl {
         }
 
     private:
-        bool request(const string& data) {
+        bool request(const string& data, bool body_field = false) {
             if (header) {
                 curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
             }
-            if (data.size() > 0) {
+            if (body_field || data.size() > 0) {
                 curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
                 curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.size());
             }
