@@ -25,19 +25,17 @@ namespace lcurl {
             curlm = nullptr;
         }
 
-        bool create(const string& url, size_t timeout_ms) {
-            CURLcode ret_result;
-            ret_result = curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-            ret_result = curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
-            ret_result = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)this);
-            ret_result = curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, error);
-            ret_result = curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeout_ms);
-            ret_result = curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, timeout_ms / 2);
-            ret_result = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
-            ret_result = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-            ret_result = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false);
-            ret_result = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-            return true;
+        void create(const string& url, size_t timeout_ms) {
+            curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+            curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)this);
+            curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, error);
+            curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeout_ms);
+            curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, timeout_ms / 2);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false);
+            curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         }
 
         bool call_get(string data) {
@@ -45,17 +43,17 @@ namespace lcurl {
         }
 
         bool call_post(string data) {
-            CURLcode ret_result = curl_easy_setopt(curl, CURLOPT_POST, 1L);
+            curl_easy_setopt(curl, CURLOPT_POST, 1L);
             return request(data);
         }
 
         bool call_put(string data) {
-            CURLcode ret_result = curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
             return request(data);
         }
 
         bool call_del(string data) {
-            CURLcode ret_result = curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
             return request(data);
         }
 
@@ -76,11 +74,11 @@ namespace lcurl {
     private:
         bool request(const string& data) {
             if (header) {
-                CURLcode ret_result = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
+                curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
             }
             if (data.size() > 0) {
-                CURLcode ret_result = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
-                CURLcode ret_result2 = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.size());
+                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
+                curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.size());
             }
             if (curl_multi_add_handle(curlm, curl) == CURLM_OK) {
                 return true;
