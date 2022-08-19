@@ -38,21 +38,21 @@ namespace lcurl {
             curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         }
 
-        bool call_get(string data) {
+        bool call_get(const char* data) {
             return request(data);
         }
 
-        bool call_post(string data) {
+        bool call_post(const char* data) {
             curl_easy_setopt(curl, CURLOPT_POST, 1L);
             return request(data, true);
         }
 
-        bool call_put(string data) {
+        bool call_put(const char* data) {
             curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
             return request(data, true);
         }
 
-        bool call_del(string data) {
+        bool call_del(const char* data) {
             curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
             return request(data);
         }
@@ -72,13 +72,14 @@ namespace lcurl {
         }
 
     private:
-        bool request(const string& data, bool body_field = false) {
+        bool request(const char* data, bool body_field = false) {
             if (header) {
                 curl_easy_setopt(curl, CURLOPT_HTTPHEADER, header);
             }
-            if (body_field || data.size() > 0) {
-                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
-                curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.size());
+            int len = data ? strlen(data) : 0;
+            if (body_field || len > 0) {
+                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
+                curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, len);
             }
             if (curl_multi_add_handle(curlm, curl) == CURLM_OK) {
                 return true;
