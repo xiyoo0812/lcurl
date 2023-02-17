@@ -12,7 +12,7 @@ namespace lcurl {
     class curl_request
     {
     public:
-        curl_request(CURLM* cm, CURL* c) : curlm(cm), curl(c) {}
+        curl_request(CURLM* cm, CURL* c) : curl(c), curlm(cm) {}
         ~curl_request() {
             if (curl) {
                 curl_multi_remove_handle(curlm, curl);
@@ -32,7 +32,7 @@ namespace lcurl {
             curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)this);
             curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, error);
             curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeout_ms);
-            curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, 1000);
+            curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, timeout_ms);
             curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false);
@@ -98,7 +98,7 @@ namespace lcurl {
     class curlm_mgr
     {
     public:
-        curlm_mgr(CURLM* cm, CURL* ce) : curlm(cm), curle(ce) {}
+        curlm_mgr(CURLM* cm, CURL* ce) : curle(ce), curlm(cm) {}
 
         void destory() {
             if (curle) {
