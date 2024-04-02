@@ -1,4 +1,4 @@
-﻿#define LUA_LIB
+#define LUA_LIB
 
 #include "lcurl.h"
 
@@ -7,7 +7,7 @@ namespace lcurl {
     luakit::lua_table open_lcurl(lua_State* L) {
         //类导出
         luakit::kit_state kit_state(L);
-        luakit::lua_table luacurl = kit_state.new_table();
+        luakit::lua_table luacurl = kit_state.new_table("curl");
         kit_state.new_class<curlm_mgr>(
             "update", &curlm_mgr::update,
             "destory", &curlm_mgr::destory,
@@ -24,13 +24,26 @@ namespace lcurl {
         //创建管理器
         CURL* curle = curl_easy_init();
         CURLM* curlm = curl_multi_init();
+        curl_multi_setopt(curlm, CURLMOPT_MAXCONNECTS, 50);
+        curl_multi_setopt(curlm, CURLMOPT_MAX_TOTAL_CONNECTIONS, 200);
         curlm_mgr* curl_mgr = new curlm_mgr(curlm, curle);
         luacurl.set("curlm_mgr", curl_mgr);
         //函数导出
-        luacurl.set_function("url_encode", [&](lua_State* L, string str){
-            char* output = curl_easy_escape(curle, str.c_str(), str.size());
+        luacurl.set_function("url_encode", [&](lua_State* L, string_view str){
+            char* output = curl_easy_escape(curle, str.data(), str.size());
             if (output) {
                 lua_pushstring(L, output);
+                curl_free(output);
+                return 1;
+            }
+            return 0;
+        });
+        //函数导出
+        luacurl.set_function("url_decode", [&](lua_State* L, string_view str){
+            int len;
+            char* output = curl_easy_unescape(curle, str.data(), str.size(), &len);
+            if (output) {
+                lua_pushlstring(L, output, len);
                 curl_free(output);
                 return 1;
             }
